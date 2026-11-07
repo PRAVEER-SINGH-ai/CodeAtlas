@@ -1,4 +1,4 @@
-﻿const supportedPlatforms = [
+const supportedPlatforms = [
     "codeforces",
     "leetcode",
     "codechef",
@@ -79,6 +79,18 @@ function normalizeProfile(raw, expectedPlatform, expectedHandle) {
                 "hardProblemsSolved"
             ),
 
+            topicStats: Array.isArray(stats.topicStats)
+                ? stats.topicStats
+                    .filter(item => item && typeof item.name === "string" && typeof item.slug === "string")
+                    .map(item => ({
+                        name: item.name.slice(0, 100),
+                        slug: item.slug.slice(0, 100),
+                        solved: nonNegative(item.solved ?? 0, "topic solved"),
+                        level: ["advanced", "intermediate", "fundamental"].includes(item.level)
+                            ? item.level
+                            : "unknown"
+                    }))
+                : [],
             contestsParticipated: nonNegative(
                 stats.contestsParticipated ?? 0,
                 "contestsParticipated"

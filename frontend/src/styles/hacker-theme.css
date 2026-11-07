@@ -1,0 +1,487 @@
+:root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background: #070B12; color: #D7E3F0; }
+html, body, #root { min-height: 100%; background: #070B12 !important; }
+body { margin: 0; color: #D7E3F0 !important; background-color: #070B12 !important; background-image: linear-gradient(rgba(56,189,248,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.035) 1px,transparent 1px),radial-gradient(ellipse at 15% 0%,rgba(34,197,94,.09),transparent 38%),radial-gradient(ellipse at 90% 20%,rgba(14,165,233,.08),transparent 35%) !important; background-size: 36px 36px,36px 36px,auto,auto !important; }
+main, main.min-h-screen { background-color: #070B12 !important; color: #D7E3F0 !important; }
+header, footer { background-color: rgba(8,15,25,.96) !important; border-color: #1E293B !important; }
+.bg-white, .bg-white\/95, .bg-white\/90 { background-color: #0D1522 !important; }
+.bg-slate-50, .bg-\[\#F7FAFC\], .bg-\[\#FCFDFE\], .bg-\[\#F8FCFE\] { background-color: #0A111D !important; }
+.text-slate-900, .text-slate-800, .text-slate-700 { color: #E2E8F0 !important; }
+.text-slate-600 { color: #CBD5E1 !important; }
+.text-slate-500, .text-slate-400 { color: #91A3B8 !important; }
+.border-slate-100, .border-slate-200, .border-slate-300 { border-color: #243246 !important; }
+input, select, textarea { background: #0A111D !important; color: #E2E8F0 !important; border-color: #334155 !important; }
+option { background: #0D1522; color: #E2E8F0; }
+h1, h2, h3, h4 { color: #F1F5F9; }
+a { color: #7DD3FC; }
+a:hover { color: #39FF88; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid #38BDF8 !important; outline-offset: 3px; }
+.codeatlas-page { color: #D7E3F0; }
+.codeatlas-page .soft-card, .codeatlas-page .feature-card, .codeatlas-page .platform-card, .codeatlas-page .stat-card { background: rgba(13,21,34,.94) !important; border-color: #26364B !important; box-shadow: 0 18px 55px rgba(0,0,0,.28); }
+.codeatlas-page .hero-grid { background-image: linear-gradient(rgba(56,189,248,.075) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.075) 1px,transparent 1px); }
+.codeatlas-page .primary-button { background: linear-gradient(110deg,#16A34A,#0284C7) !important; }
+.codeatlas-page .secondary-button { background: #101B2B !important; color: #D7E3F0 !important; border-color: #334155 !important; }
+.auth-page { background: #070B12 !important; }
+.auth-background { background: radial-gradient(circle at 8% 25%,rgba(34,197,94,.12),transparent 28%),radial-gradient(circle at 90% 80%,rgba(14,165,233,.13),transparent 30%) !important; }
+.auth-form-card { background: #0D1522 !important; border-color: #26364B !important; box-shadow: 0 25px 80px rgba(0,0,0,.4) !important; }
+.auth-label { color: #CBD5E1 !important; }
+.auth-input { background: #080F19 !important; color: #E2E8F0 !important; border-color: #334155 !important; }
+.auth-divider span { background: #0D1522 !important; color: #94A3B8 !important; }
+.auth-submit { background: linear-gradient(110deg,#16A34A,#0284C7) !important; }
+::selection { background: rgba(56,189,248,.35); color: white; }
+/* CODEATLAS CIRCUIT BACKGROUND */
+body {
+  position: relative;
+  isolation: isolate;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(3, 9, 20, 0.35), rgba(3, 9, 20, 0.48)),
+    url("/codeatlas-circuit-bg.png") center center / cover no-repeat;
+  opacity: 0.65;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+/* CIRCUIT ARTWORK - VISIBLE PAGE BACKGROUND */
+body {
+  background-image:
+    linear-gradient(rgba(3, 9, 20, 0.30), rgba(3, 9, 20, 0.42)),
+    url("/codeatlas-circuit-bg.png") !important;
+  background-position: center center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+
+/* Let the artwork show through page containers */
+#root,
+main,
+main.min-h-screen,
+.min-h-screen {
+  background-color: rgba(7, 11, 18, 0.58) !important;
+  background-image: none !important;
+}
+
+/* Keep individual cards solid and readable */
+.bg-white,
+.bg-white\/95,
+.bg-white\/90 {
+  background-color: rgba(13, 21, 34, 0.94) !important;
+}
+/* ==========================================
+   CODEATLAS // EMERALD CIRCUIT SIGNALS
+   ========================================== */
+
+body {
+  background: #050B0B !important;
+}
+
+/* Recolor blue circuit artwork into subtle emerald */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(2, 12, 9, 0.12),
+      rgba(2, 12, 9, 0.22)
+    ),
+    url("/codeatlas-circuit-bg.png") center center / cover no-repeat;
+
+  filter:
+    sepia(1)
+    saturate(2.1)
+    hue-rotate(75deg)
+    brightness(0.82)
+    contrast(1.12);
+
+  opacity: 0.78 !important;
+}
+
+/* Soft green energy glow */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 42%,
+      rgba(57, 255, 136, 0.09),
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse at 15% 85%,
+      rgba(22, 163, 74, 0.07),
+      transparent 42%
+    );
+
+  mix-blend-mode: screen;
+}
+
+/* Transparent page layers */
+#root,
+#root > div,
+main,
+main.min-h-screen,
+.min-h-screen {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Solid readable cards */
+.bg-white,
+.bg-white\/95,
+.bg-white\/90 {
+  background-color: rgba(9, 19, 25, 0.94) !important;
+}
+
+/* Dark emerald-tinted panels */
+.codeatlas-page .soft-card,
+.codeatlas-page .feature-card,
+.codeatlas-page .platform-card,
+.codeatlas-page .stat-card {
+  background: rgba(8, 22, 19, 0.90) !important;
+  border-color: rgba(57, 255, 136, 0.18) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* Subtle green signal accents */
+.rounded-2xl,
+.rounded-3xl {
+  border-color: rgba(57, 255, 136, 0.16);
+}
+
+/* CODEATLAS // MIDNIGHT BLUE CIRCUIT THEME */
+
+html, body {
+  background: #050B16 !important;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(2, 6, 20, 0.42),
+      rgba(2, 6, 20, 0.52)
+    ),
+    url("/codeatlas-circuit-bg.png") center center / cover no-repeat;
+  filter: brightness(1.30) saturate(1.42) contrast(1.12);
+  opacity: 0.88 !important;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 50% 40%,
+      rgba(30, 110, 255, 0.27),
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse at 15% 85%,
+      rgba(0, 190, 255, 0.16),
+      transparent 45%
+    );
+  mix-blend-mode: screen;
+}
+
+#root,
+#root > div,
+main,
+main.min-h-screen,
+.min-h-screen {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+/* Keep cards readable */
+.bg-white,
+.bg-white\/95,
+.bg-white\/90 {
+  background-color: rgba(5, 12, 28, 0.97) !important;
+}
+
+/* Midnight blue panels */
+.codeatlas-page .soft-card,
+.codeatlas-page .feature-card,
+.codeatlas-page .platform-card,
+.codeatlas-page .stat-card {
+  background: rgba(5, 13, 31, 0.96) !important;
+  border-color: rgba(56, 189, 248, 0.20) !important;
+  backdrop-filter: blur(8px);
+}
+
+.rounded-2xl,
+.rounded-3xl {
+  border-color: rgba(56, 189, 248, 0.18);
+}
+
+
+/* CODEATLAS UNIVERSAL CARD HOVER EFFECTS */
+.bg-white,
+.soft-card,
+.feature-card,
+.platform-card,
+.stat-card,
+article.rounded-xl,
+article.rounded-2xl,
+div.rounded-2xl.border,
+section.rounded-2xl.border {
+  transition: transform .28s ease,
+              box-shadow .28s ease,
+              border-color .28s ease,
+              background-color .28s ease;
+}
+
+.bg-white:hover,
+.soft-card:hover,
+.feature-card:hover,
+.platform-card:hover,
+.stat-card:hover,
+article.rounded-xl:hover,
+article.rounded-2xl:hover,
+div.rounded-2xl.border:hover,
+section.rounded-2xl.border:hover {
+  transform: translateY(-4px);
+  border-color: rgba(56, 189, 248, .48) !important;
+  box-shadow: 0 12px 32px rgba(0, 120, 255, .13),
+              0 0 15px rgba(56, 189, 248, .09);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-white, .soft-card, .feature-card, .platform-card,
+  .stat-card, article.rounded-xl, article.rounded-2xl,
+  div.rounded-2xl.border, section.rounded-2xl.border {
+    transition: none;
+  }
+}
+
+ /* CODEATLAS HIGH CONTRAST TEXT */
+ body,
+ #root {
+   color: #f1f5ff;
+ }
+
+ .codeatlas-page {
+   color: #f1f5ff;
+ }
+
+ .codeatlas-page h1,
+ .codeatlas-page h2,
+ .codeatlas-page h3 {
+   color: #ffffff;
+ }
+
+/* CODEATLAS OBSIDIAN BLACK OVERRIDE */
+body {
+    background-color: #02040a !important;
+    color: #f4f7ff;
+}
+
+body::before {
+    filter: brightness(1.12) saturate(1.35) contrast(1.18);
+}
+
+body::after {
+    background:
+        radial-gradient(
+            ellipse at 50% 40%,
+            rgba(20, 75, 190, 0.18),
+            transparent 65%
+        ),
+        radial-gradient(
+            ellipse at 15% 85%,
+            rgba(0, 145, 220, 0.12),
+            transparent 45%
+        );
+}
+
+#root,
+#root > div,
+main,
+main.min-h-screen,
+.min-h-screen {
+    background-color: transparent !important;
+}
+
+.bg-white,
+.bg-white\/95,
+.bg-white\/90 {
+    background-color: rgba(4, 8, 18, 0.97) !important;
+}
+
+.codeatlas-page .soft-card,
+.codeatlas-page .feature-card,
+.codeatlas-page .platform-card,
+.codeatlas-page .stat-card {
+    background: rgba(4, 9, 21, 0.96) !important;
+    border-color: rgba(50, 125, 220, 0.24) !important;
+}
+
+.rounded-2xl,
+.rounded-3xl {
+    border-color: rgba(50, 125, 220, 0.22);
+}
+/* CODEATLAS - DEEPER OBSIDIAN FINISH */
+body {
+    background-color: #010207 !important;
+}
+
+.bg-white,
+.bg-white\/95,
+.bg-white\/90 {
+    background-color: rgba(2, 5, 13, 0.98) !important;
+}
+
+.codeatlas-page .soft-card,
+.codeatlas-page .feature-card,
+.codeatlas-page .platform-card,
+.codeatlas-page .stat-card {
+    background: rgba(2, 6, 15, 0.98) !important;
+}
+
+body::after {
+    background:
+        radial-gradient(
+            ellipse at 50% 40%,
+            rgba(15, 65, 175, 0.14),
+            transparent 65%
+        ),
+        radial-gradient(
+            ellipse at 15% 85%,
+            rgba(0, 115, 190, 0.09),
+            transparent 45%
+        );
+}
+/* CODEATLAS - STEALTH BLACK BACKGROUND */
+html,
+body {
+    background-color: #000104 !important;
+}
+
+body::before {
+    filter: brightness(0.72) saturate(1.25) contrast(1.2) !important;
+    opacity: 0.82 !important;
+}
+
+body::after {
+    background:
+        radial-gradient(
+            ellipse at 50% 40%,
+            rgba(8, 35, 100, 0.09),
+            transparent 65%
+        ),
+        radial-gradient(
+            ellipse at 15% 85%,
+            rgba(0, 75, 130, 0.06),
+            transparent 45%
+        ) !important;
+}
+
+#root,
+#root > div,
+main,
+main.min-h-screen,
+.min-h-screen {
+    background-color: transparent !important;
+}
+
+.bg-white,
+.bg-white\/95,
+.bg-white\/90 {
+    background-color: rgba(1, 3, 9, 0.99) !important;
+}
+
+.codeatlas-page .soft-card,
+.codeatlas-page .feature-card,
+.codeatlas-page .platform-card,
+.codeatlas-page .stat-card {
+    background: rgba(1, 4, 11, 0.99) !important;
+    border-color: rgba(35, 95, 180, 0.18) !important;
+}
+/* FINAL MICRO-ADJUSTMENT - OBSIDIAN BLACK */
+html,
+body {
+    background-color: #000000 !important;
+}
+
+body::before {
+    filter: brightness(0.62) saturate(1.2) contrast(1.18) !important;
+    opacity: 0.78 !important;
+}
+
+.bg-white,
+.bg-white\/95,
+.bg-white\/90 {
+    background-color: rgba(0, 2, 7, 0.99) !important;
+}
+
+.codeatlas-page .soft-card,
+.codeatlas-page .feature-card,
+.codeatlas-page .platform-card,
+.codeatlas-page .stat-card {
+    background: rgba(0, 3, 9, 0.99) !important;
+}
+/* CODEATLAS - LIGHT GREEN CIRCUIT SIGNALS */
+body::before {
+    filter: hue-rotate(-75deg) brightness(0.62)
+            saturate(1.2) contrast(1.18) !important;
+}
+/* LIGHTER GREEN CIRCUIT SIGNALS ONLY */
+body::before {
+    filter: hue-rotate(-75deg) brightness(0.88)
+            saturate(1.35) contrast(1.18) !important;
+}
+/* GREEN CIRCUITS - LUMINOUS 3D GLOW */
+body::before {
+    filter: hue-rotate(-75deg) brightness(1.18)
+            saturate(1.75) contrast(1.22)
+            drop-shadow(0 0 5px rgba(120, 255, 75, 0.65))
+            drop-shadow(0 0 14px rgba(90, 255, 40, 0.42))
+            drop-shadow(0 0 28px rgba(60, 220, 30, 0.25)) !important;
+    opacity: 0.95 !important;
+}
+/* SHARP CIRCUIT BACKGROUND - PRESERVE GREEN TONE */
+body::before {
+    filter: hue-rotate(-75deg)
+            brightness(0.95)
+            saturate(1.55)
+            contrast(1.42) !important;
+    image-rendering: auto !important;
+    opacity: 0.92 !important;
+}
+/* CIRCUIT BACKGROUND - SMOOTH PIXEL RENDERING */
+body::before {
+    image-rendering: auto !important;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    filter: hue-rotate(-75deg)
+            brightness(0.95)
+            saturate(1.55)
+            contrast(1.25) !important;
+}

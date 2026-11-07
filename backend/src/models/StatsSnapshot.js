@@ -1,4 +1,4 @@
-﻿const mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 const statsSnapshotSchema = new mongoose.Schema({
     account: {
@@ -34,6 +34,9 @@ const statsSnapshotSchema = new mongoose.Schema({
         min: 0,
         default: 0
     },
+    easyProblemsSolved: { type: Number, default: 0 },
+    mediumProblemsSolved: { type: Number, default: 0 },
+    hardProblemsSolved: { type: Number, default: 0 },
     contestsParticipated: {
         type: Number,
         min: 0,

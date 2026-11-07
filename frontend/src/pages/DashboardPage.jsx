@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Code2, LogOut, UserRound, Plus, ExternalLink,
@@ -9,6 +9,9 @@ import {
 import { useAuth } from "../context/AuthContext";
 import api, { getApiError } from "../lib/api";
 import AnalyticsSection from "../components/AnalyticsSection";
+import LeetCodeWorkspace from "../components/LeetCodeWorkspace";
+import PlatformRatingGraphs from "../components/PlatformRatingGraphs";
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 
 
 const demoAccounts = [
@@ -77,6 +80,7 @@ function Status({ account }) {
     </span>
   );
 }
+
 
 function AccountCard({ account, onDelete, deleting, onStartVerification, onCheckVerification, verificationCode, verifying, demoMode, onSync, syncing }) {
   const platformName = account.platform
@@ -262,6 +266,7 @@ export default function DashboardPage() {
   const [verificationCodes, setVerificationCodes] = useState({});
   const [verifyingId, setVerifyingId] = useState(null);
   const [syncingIds, setSyncingIds] = useState([]);
+  const [activeSection, setActiveSection] = useState("overview");
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -667,7 +672,38 @@ export default function DashboardPage() {
           </div>
         </div>
 
-                <AnalyticsSection accounts={accounts} demoMode={demoMode} />
+        <nav className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6" aria-label="Dashboard features">
+          {[
+            { id: "overview", title: "Overview", detail: "Accounts & analytics" },
+            { id: "activity", title: "Activity", detail: "Submission heatmap" },
+            { id: "contests", title: "Contest IQ", detail: "Performance analytics" },
+            { id: "topics", title: "Topic Intel", detail: "Topic strength" },
+            { id: "topicDistribution", title: "Topic Distribution", detail: "Problem breakdown" },
+            { id: "practice", title: "Recommendations", detail: "Practice next" },
+            { id: "difficulty", title: "Difficulty", detail: "Easy / Medium / Hard" },
+            { id: "goals", title: "Goals", detail: "Milestones & targets" },
+            { id: "ratings", title: "Rating Graphs", detail: "All platform curves" },
+            { id: "lists", title: "Public Lists", detail: "Question collections" }
+          ].map(item => (
+            <button key={item.id} type="button"
+              onClick={() => setActiveSection(item.id)}
+              aria-current={activeSection === item.id ? "page" : undefined}
+              className={`rounded-2xl border p-4 text-left transition duration-200 ${
+                activeSection === item.id
+                  ? "border-sky-400/70 bg-[#101827] shadow-[0_0_24px_rgba(56,189,248,.12)]"
+                  : "border-slate-700 bg-[#0F1726] hover:border-orange-400/60 hover:bg-[#151F30]"
+              }`}>
+              <span className={`block text-sm font-extrabold ${
+                activeSection === item.id ? "text-sky-300" : "text-slate-100"
+              }`}>{item.title}</span>
+              <span className="mt-1 block text-[11px] text-slate-400">{item.detail}</span>
+            </button>
+          ))}
+        </nav>
+
+        {activeSection === "overview" && (
+          <div className="space-y-10">
+<AnalyticsSection accounts={accounts} demoMode={demoMode} />
 
 <section>
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -804,8 +840,37 @@ export default function DashboardPage() {
             </div>
           )}
         </section>
+          </div>
+        )}
 
-        <footer className="mt-12 border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+        {activeSection === "topicDistribution" && (
+          <LeetCodeWorkspace accounts={accounts} mode="topicDistribution" demoMode={demoMode} />
+        )}
+
+        {activeSection === "topics" && (
+          <LeetCodeWorkspace accounts={accounts} mode="topics" demoMode={demoMode} />
+        )}
+        {activeSection === "practice" && (
+          <LeetCodeWorkspace accounts={accounts} mode="practice" demoMode={demoMode} />
+        )}
+        {activeSection === "lists" && (
+          <LeetCodeWorkspace accounts={accounts} mode="lists" demoMode={demoMode} />
+        )}
+        {activeSection === "ratings" && (
+          <PlatformRatingGraphs accounts={accounts} demoMode={demoMode} />
+        )}
+        {activeSection === "activity" && (
+          <LeetCodeWorkspace accounts={accounts} mode="activity" demoMode={demoMode} />
+        )}
+        {activeSection === "contests" && (
+          <LeetCodeWorkspace accounts={accounts} mode="contests" demoMode={demoMode} />
+        )}
+        {activeSection === "difficulty" && (
+          <LeetCodeWorkspace accounts={accounts} mode="difficulty" demoMode={demoMode} />
+        )}
+        {activeSection === "goals" && (
+          <LeetCodeWorkspace accounts={accounts} mode="goals" demoMode={demoMode} />
+        )}<footer className="mt-12 border-t border-slate-200 py-6 text-center text-xs text-slate-400">
           CodeAtlas Â· Your coding universe, unified.
         </footer>
       </div>

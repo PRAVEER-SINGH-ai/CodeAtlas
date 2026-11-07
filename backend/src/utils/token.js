@@ -1,4 +1,4 @@
-﻿const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
 function generateAccessToken(userId) {
     if (!process.env.JWT_ACCESS_SECRET ||
@@ -9,7 +9,7 @@ function generateAccessToken(userId) {
     return jwt.sign(
         { sub: userId },
         process.env.JWT_ACCESS_SECRET,
-        { expiresIn: "15m" }
+        { expiresIn: "15d" }
     );
 }
 

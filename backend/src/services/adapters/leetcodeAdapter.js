@@ -1,4 +1,4 @@
-﻿const dns = require("node:dns");
+const dns = require("node:dns");
 dns.setDefaultResultOrder("ipv4first");
 
 const LEETCODE_API = "https://leetcode.com/graphql/";
@@ -77,6 +77,23 @@ async function fetchProfile(handle) {
                     company
                     school
                     ranking
+                }
+                tagProblemCounts {
+                    advanced {
+                        tagName
+                        tagSlug
+                        problemsSolved
+                    }
+                    intermediate {
+                        tagName
+                        tagSlug
+                        problemsSolved
+                    }
+                    fundamental {
+                        tagName
+                        tagSlug
+                        problemsSolved
+                    }
                 }
                 submitStats {
                     acSubmissionNum {
@@ -183,6 +200,57 @@ async function fetchProfile(handle) {
 
     const currentRating = Number(contest.rating);
 
+    // Best-effort public submission calendar. Calendar failure must not
+    // prevent the rest of the LeetCode profile from syncing.
+    const activityMap = new Map();
+    let calendarMeta = { streak: 0, totalActiveDays: 0 };
+
+    for (const year of [new Date().getFullYear(), new Date().getFullYear() - 1]) {
+        try {
+            const calendarQuery = `
+                query userCalendar($username: String!, $year: Int) {
+                    matchedUser(username: $username) {
+                        userCalendar(year: $year) {
+                            streak
+                            totalActiveDays
+                            submissionCalendar
+                        }
+                    }
+                }
+            `;
+            const calendarData = await graphql(calendarQuery, { username, year });
+            const raw = calendarData?.matchedUser?.userCalendar;
+            if (!raw) continue;
+
+            calendarMeta = {
+                streak: Number(raw.streak) || calendarMeta.streak,
+                totalActiveDays: Number(raw.totalActiveDays) || calendarMeta.totalActiveDays
+            };
+
+            let parsed = raw.submissionCalendar;
+            if (typeof parsed === "string") parsed = JSON.parse(parsed || "{}");
+
+            if (parsed && typeof parsed === "object") {
+                for (const [timestamp, count] of Object.entries(parsed)) {
+                    const date = new Date(Number(timestamp) * 1000);
+                    if (!Number.isNaN(date.getTime())) {
+                        activityMap.set(date.toISOString().slice(0, 10), Math.max(0, Number(count) || 0));
+                    }
+                }
+            }
+        } catch (calendarError) {
+            // LeetCode may change or restrict this optional GraphQL field.
+            // Preserve profile syncing even when the calendar is unavailable.
+        }
+    }
+
+    const activityCalendar = {
+        streak: calendarMeta.streak,
+        totalActiveDays: calendarMeta.totalActiveDays,
+        days: Array.from(activityMap.entries())
+            .map(([date, count]) => ({ date, count }))
+            .sort((a, b) => a.date.localeCompare(b.date))
+    };
     return {
         platform: "leetcode",
         handle: user.username,
@@ -210,7 +278,16 @@ async function fetchProfile(handle) {
             maxRank: null,
 
             problemsSolved: Number(acceptedAll?.count) || 0,
-            easyProblemsSolved: easySolved,
+      easyProblemsSolved: easySolved,
+            topicStats: ["advanced", "intermediate", "fundamental"]
+                .flatMap(level => (user.tagProblemCounts?.[level] || []).map(item => ({
+                    name: String(item.tagName || ""),
+                    slug: String(item.tagSlug || ""),
+                    solved: Math.max(0, Number(item.problemsSolved) || 0),
+                    level
+                })))
+                .filter(item => item.name && item.slug),
+            activityCalendar,
             mediumProblemsSolved: mediumSolved,
             hardProblemsSolved: hardSolved,
             contestsParticipated:

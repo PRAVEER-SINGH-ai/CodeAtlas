@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -267,94 +267,7 @@ export default function AnalyticsSection({ accounts, demoMode }) {
         />
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[1.65fr_1fr]">
-        <div className="min-w-0 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-          <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h3 className="font-extrabold text-slate-800">Rating history</h3>
-              <p className="mt-1 text-xs text-slate-400">
-                Follow rating changes for an individual profile.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              <select
-                value={selectedId}
-                onChange={event => setSelectedId(event.target.value)}
-                className="max-w-[180px] rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs font-semibold text-slate-600 outline-none focus:border-sky-400"
-              >
-                {history.map(item => (
-                  <option key={item.accountId} value={item.accountId}>
-                    {item.platform} · {item.handle}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={range}
-                onChange={event => setRange(event.target.value)}
-                className="rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs font-semibold text-slate-600 outline-none focus:border-sky-400"
-              >
-                <option value="30d">30 days</option>
-                <option value="90d">90 days</option>
-                <option value="6m">6 months</option>
-                <option value="1y">1 year</option>
-                <option value="all">All time</option>
-              </select>
-            </div>
-          </div>
-
-          {loading ? (
-            <div className="flex h-[260px] items-center justify-center text-sm text-slate-400">
-              Loading rating history...
-            </div>
-          ) : chartData.length > 0 ? (
-            <>
-              <div className="mb-3 flex items-end justify-between">
-                <div>
-                  <p className="text-xs text-slate-400">Current rating</p>
-                  <p className="text-2xl font-extrabold text-slate-900">
-                    {currentRating.toLocaleString("en-IN")}
-                  </p>
-                </div>
-                <p className="text-xs text-slate-400">
-                  Peak: <strong className="text-slate-700">{bestRating.toLocaleString("en-IN")}</strong>
-                </p>
-              </div>
-
-              <div className="h-[250px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 10, right: 12, left: -18, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#edf2f7" />
-                    <XAxis dataKey="dateLabel" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                    <YAxis domain={["auto", "auto"]} tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
-                    <Tooltip
-                      contentStyle={{ borderRadius: 12, border: "1px solid #e2e8f0", fontSize: 12 }}
-                      formatter={value => [value, "Rating"]}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="rating"
-                      stroke="#45B6E8"
-                      strokeWidth={3}
-                      dot={false}
-                      activeDot={{ r: 6, fill: "#45B6E8", stroke: "#fff", strokeWidth: 2 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </>
-          ) : (
-            <div className="flex h-[260px] flex-col items-center justify-center text-center">
-              <TrendingUp size={30} className="text-slate-300" />
-              <p className="mt-3 text-sm font-bold text-slate-600">No rating history yet</p>
-              <p className="mt-1 max-w-xs text-xs text-slate-400">
-                Historical snapshots will appear here after your profile data has been synced.
-              </p>
-            </div>
-          )}
-        </div>
-
+      <div className="grid gap-5">
         <div className="min-w-0 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
           <div className="mb-5">
             <h3 className="font-extrabold text-slate-800">Problems by platform</h3>

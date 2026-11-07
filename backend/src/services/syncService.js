@@ -1,4 +1,4 @@
-﻿const PlatformAccount = require("../models/PlatformAccount");
+const PlatformAccount = require("../models/PlatformAccount");
 const StatsSnapshot = require("../models/StatsSnapshot");
 const RatingHistory = require("../models/RatingHistory");
 
@@ -51,6 +51,9 @@ async function syncAccount(accountId, userId) {
             globalRank: null,
             countryRank: null,
             problemsSolved: profile.stats.problemsSolved,
+      easyProblemsSolved: profile.stats.easyProblemsSolved || 0,
+      mediumProblemsSolved: profile.stats.mediumProblemsSolved || 0,
+      hardProblemsSolved: profile.stats.hardProblemsSolved || 0,
             contestsParticipated: profile.stats.contestsParticipated,
             totalSubmissions: profile.stats.totalSubmissions,
             acceptedSubmissions: profile.stats.acceptedSubmissions,
