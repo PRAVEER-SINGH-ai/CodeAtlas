@@ -1,4 +1,4 @@
-
+﻿
 .interactive-surface {
   --fire-opacity: 0.85;
   --ice-opacity: 0.9;
@@ -150,6 +150,116 @@
   }
 
   .interactive-surface.fire {
+    transform: none;
+  }
+}
+
+/* =========================================================
+   GLOBAL FIRE × ELECTRIFIED ICE INTERACTIONS
+   Reuses the original fire-flow and ice-burst animations.
+   ========================================================= */
+
+.atlas-interactive {
+  --fire-opacity: .85;
+  --ice-opacity: .9;
+  --lift: -6px;
+  --scale: 1.018;
+
+  position: relative;
+  isolation: isolate;
+  transition:
+    transform 350ms ease,
+    box-shadow 350ms ease,
+    border-color 350ms ease;
+}
+
+.atlas-interactive::before,
+.atlas-interactive::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+}
+
+/* Keep regular card and button content above the animated light. */
+.atlas-interactive > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* FIRE */
+.atlas-interactive.fire {
+  transform: translateY(var(--lift)) scale(var(--scale));
+  border-color: rgba(255, 75, 20, .9);
+  box-shadow:
+    0 15px 40px rgba(255, 40, 0, .25),
+    0 0 35px rgba(255, 90, 0, .38),
+    0 0 65px rgba(255, 145, 0, .2);
+}
+
+.atlas-interactive.fire::before {
+  opacity: var(--fire-opacity);
+  background:
+    radial-gradient(ellipse at 10% 100%, rgba(255, 20, 0, .55), transparent 48%),
+    radial-gradient(ellipse at 90% 0%, rgba(255, 130, 0, .48), transparent 48%),
+    radial-gradient(ellipse at 50% 100%, rgba(255, 75, 0, .32), transparent 55%),
+    linear-gradient(
+      125deg,
+      transparent 10%,
+      rgba(255, 30, 0, .22) 35%,
+      rgba(255, 180, 0, .28) 55%,
+      rgba(255, 45, 0, .18) 75%,
+      transparent 95%
+    );
+  background-size: 200% 200%;
+  animation: fire-flow 1.15s ease-in-out infinite alternate;
+}
+
+/* ICE BURST */
+.atlas-interactive.ice::after {
+  opacity: var(--ice-opacity);
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 1), transparent 35%),
+    radial-gradient(ellipse at 0% 0%, rgba(65, 190, 255, .8), transparent 48%),
+    radial-gradient(ellipse at 100% 100%, rgba(125, 225, 255, .8), transparent 48%),
+    linear-gradient(115deg, transparent 10%, rgba(95, 210, 255, .7), transparent 90%);
+  animation: ice-burst 1100ms ease-out forwards;
+}
+
+/* Effect intensity */
+.atlas-interactive.atlas-large {
+  --fire-opacity: 1;
+  --ice-opacity: 1;
+  --lift: -12px;
+  --scale: 1.035;
+}
+
+.atlas-interactive.atlas-medium {
+  --fire-opacity: .7;
+  --ice-opacity: .75;
+  --lift: -6px;
+  --scale: 1.018;
+}
+
+.atlas-interactive.atlas-small {
+  --fire-opacity: .4;
+  --ice-opacity: .45;
+  --lift: -2px;
+  --scale: 1.01;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-interactive,
+  .atlas-interactive::before,
+  .atlas-interactive::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .atlas-interactive.fire {
     transform: none;
   }
 }

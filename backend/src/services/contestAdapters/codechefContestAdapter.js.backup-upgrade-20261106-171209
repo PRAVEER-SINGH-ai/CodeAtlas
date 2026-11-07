@@ -1,0 +1,55 @@
+﻿async function fetchContests() {
+    const url = "https://www.codechef.com/api/list/contests/all?sort_by=START&sorting_order=asc&offset=0&mode=all";
+
+    const response = await fetch(url, {
+        signal: AbortSignal.timeout(15000),
+        headers: {
+            "User-Agent": "CodeAtlas/1.0",
+            "Accept": "application/json"
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`CodeChef HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const list = [
+        ...(data.future_contests || []),
+        ...(data.present_contests || [])
+    ];
+
+    const now = Date.now();
+
+    return list.map(item => {
+        const startTime = new Date(
+            item.contest_start_date_iso || item.contest_start_date
+        );
+
+        const endTime = new Date(
+            item.contest_end_date_iso || item.contest_end_date
+        );
+
+        if (isNaN(startTime.getTime())) return null;
+
+        const durationSeconds = Number(item.contest_duration)
+            ? Number(item.contest_duration) * 60
+            : Math.max(0, (endTime - startTime) / 1000);
+
+        const end = startTime.getTime() + durationSeconds * 1000;
+
+        return {
+            platform: "codechef",
+            contestId: String(item.contest_code || item.contest_name),
+            name: item.contest_name,
+            url: `https://www.codechef.com/${item.contest_code}`,
+            startTime,
+            durationSeconds,
+            status: now < startTime.getTime()
+                ? "upcoming"
+                : now < end ? "ongoing" : "finished"
+        };
+    }).filter(Boolean);
+}
+
+module.exports = { fetchContests };

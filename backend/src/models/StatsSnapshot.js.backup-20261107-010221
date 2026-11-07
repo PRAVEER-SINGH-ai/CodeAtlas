@@ -1,0 +1,74 @@
+﻿const mongoose = require("mongoose");
+
+const statsSnapshotSchema = new mongoose.Schema({
+    account: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PlatformAccount",
+        required: true,
+        index: true
+    },
+
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        index: true
+    },
+
+    rating: {
+        type: Number,
+        default: null
+    },
+
+    maxRating: {
+        type: Number,
+        default: null
+    },
+
+    globalRank: {
+        type: Number,
+        default: null
+    },
+
+    countryRank: {
+        type: Number,
+        default: null
+    },
+
+    problemsSolved: {
+        type: Number,
+        default: 0
+    },
+
+    contestsParticipated: {
+        type: Number,
+        default: 0
+    },
+
+    totalSubmissions: {
+        type: Number,
+        default: 0
+    },
+
+    acceptedSubmissions: {
+        type: Number,
+        default: 0
+    },
+
+    accuracy: {
+        type: Number,
+        default: null
+    },
+
+    capturedAt: {
+        type: Date,
+        default: Date.now,
+        index: true
+    }
+}, {
+    timestamps: true
+});
+
+statsSnapshotSchema.index({ account: 1, capturedAt: -1 });
+
+module.exports = mongoose.model("StatsSnapshot", statsSnapshotSchema);

@@ -1,5 +1,6 @@
-
-import { useState } from "react";
+﻿
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Activity,
   ArrowRight,
@@ -81,11 +82,21 @@ const platforms = [
 const stats = [
   { value: "04", label: "Platforms", icon: <Code2 />, color: "blue" },
   { value: "01", label: "Unified profile", icon: <Users />, color: "green" },
-  { value: "360°", label: "Progress view", icon: <Activity />, color: "pink" },
+  { value: "360Â°", label: "Progress view", icon: <Activity />, color: "pink" },
 ];
 
 function LandingPage() {
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [verificationSuccess, setVerificationSuccess] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("verified") === "1") {
+      setVerificationSuccess(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
 
   const closeMenu = () => setMobileMenu(false);
 
@@ -266,6 +277,32 @@ function LandingPage() {
         }
       `}</style>
 
+      {verificationSuccess && (
+        <div
+          role="status"
+          className="fixed left-1/2 top-5 z-[100] flex w-[calc(100%-32px)] max-w-xl -translate-x-1/2 items-center gap-3 rounded-2xl border border-[#CDECC0] bg-white px-5 py-4 shadow-xl"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EFF9E7] text-[#579C36]">
+            <CheckCircle2 size={22} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-extrabold text-slate-800">
+              Email verified successfully!
+            </p>
+            <p className="mt-1 text-xs leading-5 text-slate-500">
+              You're registered and logged in. Welcome to CodeAtlas!
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setVerificationSuccess(false)}
+            className="rounded-lg px-2 py-1 text-lg text-slate-400 hover:bg-slate-100"
+            aria-label="Dismiss message"
+          >
+            ×
+          </button>
+        </div>
+      )}
       <div className="codeatlas-page">
         {/* NAVBAR */}
         <header className="relative z-30 border-b border-slate-100 bg-white">
@@ -651,7 +688,7 @@ function LandingPage() {
             </div>
           </div>
           <div className="border-t border-slate-100 py-4 text-center text-[11px] text-slate-400">
-            © {new Date().getFullYear()} CodeAtlas. All rights reserved.
+            Â© {new Date().getFullYear()} CodeAtlas. All rights reserved.
           </div>
         </footer>
       </div>
@@ -660,3 +697,4 @@ function LandingPage() {
 }
 
 export default LandingPage;
+

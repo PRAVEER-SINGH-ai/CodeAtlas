@@ -1,0 +1,80 @@
+﻿function decodeHtml(value) {
+    return value
+        .replace(/&amp;/g, "&")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">");
+}
+
+async function fetchContests() {
+    const response = await fetch("https://atcoder.jp/contests?lang=en", {
+        signal: AbortSignal.timeout(15000),
+        headers: { "User-Agent": "CodeAtlas/1.0" }
+    });
+
+    if (!response.ok) {
+        throw new Error(`AtCoder HTTP ${response.status}`);
+    }
+
+    const html = await response.text();
+    const rows = html.match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    const contests = [];
+    const seen = new Set();
+
+    for (const row of rows) {
+        const link = row.match(/href="(\/contests\/[^"]+)"/i);
+        const date = row.match(
+            /\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\s*[+-]\d{4}/
+        );
+        const duration = row.match(/\b\d{1,3}:\d{2}\b/);
+
+        if (!link || !date || !duration) continue;
+
+        const path = link[1];
+        const id = path.split("/").filter(Boolean).pop();
+
+        if (!id || seen.has(id)) continue;
+
+        const anchor = row.match(
+            /<a[^>]*href="\/contests\/[^"]+"[^>]*>([\s\S]*?)<\/a>/i
+        );
+
+        if (!anchor) continue;
+
+        const name = decodeHtml(
+            anchor[1].replace(/<[^>]+>/g, "").trim()
+        );
+
+        const startTime = new Date(date[0].replace(/\s+/, "T"));
+        const [hours, minutes] = duration[0].split(":").map(Number);
+        const durationSeconds = (hours * 60 + minutes) * 60;
+
+        if (!name || isNaN(startTime.getTime())) continue;
+
+        seen.add(id);
+
+        const now = Date.now();
+        const end = startTime.getTime() + durationSeconds * 1000;
+
+        contests.push({
+            platform: "atcoder",
+            contestId: id,
+            name,
+            url: `https://atcoder.jp${path}`,
+            startTime,
+            durationSeconds,
+            status: now < startTime.getTime()
+                ? "upcoming"
+                : now < end ? "ongoing" : "finished"
+        });
+    }
+
+    if (!contests.length) {
+        throw new Error("No AtCoder contests parsed; page format may have changed");
+    }
+
+    return contests;
+}
+
+module.exports = { fetchContests };

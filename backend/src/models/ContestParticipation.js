@@ -1,0 +1,46 @@
+﻿const mongoose = require("mongoose");
+
+const participationSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
+    contest: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Contest",
+        required: true
+    },
+    personalStatus: {
+        type: String,
+        enum: ["planned", "registered", "attended", "missed"],
+        default: "planned"
+    },
+    reminderAt: {
+        type: Date,
+        default: null
+    },
+    reminderSentAt: {
+        type: Date,
+        default: null
+    },
+    notes: {
+        type: String,
+        maxlength: 500,
+        default: ""
+    }
+}, {
+    timestamps: true
+});
+
+participationSchema.index(
+    { user: 1, contest: 1 },
+    { unique: true }
+);
+
+participationSchema.index({
+    reminderSentAt: 1,
+    reminderAt: 1
+});
+
+module.exports = mongoose.model("ContestParticipation", participationSchema);

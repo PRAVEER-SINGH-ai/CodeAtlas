@@ -1,0 +1,87 @@
+﻿const mongoose = require("mongoose");
+
+const platformAccountSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        index: true
+    },
+
+    platform: {
+        type: String,
+        required: true,
+        enum: ["codeforces", "leetcode", "codechef", "atcoder", "geeksforgeeks"]
+    },
+
+    handle: {
+        type: String,
+        required: true,
+        trim: true
+    },
+
+    profileUrl: String,
+
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+
+    verificationStatus: {
+        type: String,
+        enum: ["pending", "verified", "failed"],
+        default: "pending"
+    },
+
+    verificationCodeHash: {
+        type: String,
+        default: null,
+        select: false
+    },
+
+    verificationExpiresAt: {
+        type: Date,
+        default: null
+    },
+
+    isPrimary: {
+        type: Boolean,
+        default: false
+    },
+
+    identity: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
+
+    currentStats: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
+
+    lastSyncedAt: {
+        type: Date,
+        default: null
+    },
+
+    syncStatus: {
+        type: String,
+        enum: ["never_synced", "success", "failed", "in_progress"],
+        default: "never_synced"
+    },
+
+    syncError: {
+        type: String,
+        default: null
+    }
+}, {
+    timestamps: true
+});
+
+platformAccountSchema.index(
+    { user: 1, platform: 1, handle: 1 },
+    { unique: true }
+);
+
+module.exports = mongoose.model("PlatformAccount", platformAccountSchema);
+

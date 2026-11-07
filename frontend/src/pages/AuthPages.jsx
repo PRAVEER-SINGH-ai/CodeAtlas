@@ -1,6 +1,6 @@
-
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+﻿
+import { useState, useEffect, useRef} from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowRight,
@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 
 import InteractiveSurface from "../components/InteractiveSurface";
+import { useAuth } from "../context/AuthContext";
+import api from "../lib/api";
 
 // SHARED AUTH LAYOUT
 function AuthLayout({
@@ -232,25 +234,60 @@ function Message({ children, success = false }) {
 
 // LOGIN PAGE
 export function LoginPage() {
+  const navigate = useNavigate();
+  const { login, loading, startDemo, resendVerification } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState("");
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     setError("");
+    setNeedsVerification(false);
+    setResendMessage("");
 
     if (!email.trim() || !password) {
       setError("Please enter your email and password.");
       return;
     }
 
-    setError(
-      "Authentication isn't connected yet. We'll enable login after backend integration."
-    );
+    const result = await login({
+      email: email.trim().toLowerCase(),
+      password
+    });
+
+    if (result.success) {
+      navigate("/dashboard", { replace: true });
+    } else {
+      setError(result.message);
+      if (result.requiresEmailVerification) {
+        setNeedsVerification(true);
+      }
+    }
   }
 
+  async function handleResendVerification() {
+    if (!email.trim()) {
+      setResendMessage("Enter your email address first.");
+      return;
+    }
+
+    setResending(true);
+    setResendMessage("");
+
+    try {
+      const result = await resendVerification(email.trim().toLowerCase());
+      setResendMessage(result.message);
+    } catch {
+      setResendMessage("Could not resend the email. Please try again.");
+    } finally {
+      setResending(false);
+    }
+  }
   return (
     <AuthLayout
       heading="Welcome back!"
@@ -303,10 +340,39 @@ export function LoginPage() {
 
         <Message>{error}</Message>
 
+        {needsVerification && (
+          <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 space-y-3">
+            <p className="text-sm font-semibold text-slate-700">
+              Your email is not verified yet.
+            </p>
+            <button
+              type="button"
+              disabled={resending || !email.trim()}
+              onClick={handleResendVerification}
+              className="w-full rounded-xl bg-orange-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-600 disabled:opacity-60"
+            >
+              {resending ? "Sending..." : "Resend verification email"}
+            </button>
+            {resendMessage && (
+              <p className="text-xs leading-5 text-slate-600">{resendMessage}</p>
+            )}
+          </div>
+        )}
+
         <AuthButton>
           Log in <ArrowRight size={17} />
         </AuthButton>
-      </form>
+              <button
+          type="button"
+          onClick={() => {
+            startDemo();
+            navigate("/dashboard", { replace: true });
+          }}
+          className="w-full rounded-xl border border-[#45B6E8] bg-[#E5F6FC] px-4 py-3 text-sm font-extrabold text-[#249dcc] transition hover:bg-sky-100"
+        >
+          Explore demo dashboard
+        </button>
+</form>
 
       <div className="auth-divider">
         <span>NEW TO CODEATLAS?</span>
@@ -327,14 +393,18 @@ export function LoginPage() {
 
 // REGISTER PAGE
 export function RegisterPage() {
+  const { register, resendVerification, loading } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [terms, setTerms] = useState(false);
   const [error, setError] = useState("");
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [resendMessage, setResendMessage] = useState("");
+  const [resending, setResending] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     setError("");
 
@@ -353,8 +423,74 @@ export function RegisterPage() {
       return;
     }
 
-    setError(
-      "Registration isn't connected yet. We'll enable account creation after backend integration."
+    const baseUsername = email.split("@")[0]
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "")
+      .slice(0, 20);
+
+    const username = `${baseUsername || "developer"}_${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const result = await register({
+      name: name.trim(),
+      username,
+      email: email.trim().toLowerCase(),
+      password
+    });
+
+    if (result.success && result.requiresEmailVerification) {
+      setPendingEmail(email.trim().toLowerCase());
+    } else if (!result.success) {
+      setError(result.message);
+    } else {
+      setError("Unexpected server response. Please contact support.");
+    }
+  }
+
+  async function handleResend() {
+    setResending(true);
+    setResendMessage("");
+
+    const result = await resendVerification(pendingEmail);
+    setResendMessage(result.message);
+    setResending(false);
+  }
+
+  if (pendingEmail) {
+    return (
+      <AuthLayout
+        mode="register"
+        heading="Check your inbox"
+        description="Your account is almost ready. Verify your email to activate it."
+      >
+        <div className="space-y-5 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#E5F6FC] text-[#249dcc]">
+            <Mail size={30} />
+          </div>
+          <p className="text-sm leading-7 text-slate-600">
+            We sent a verification link to
+            <br />
+            <strong className="break-all text-slate-800">{pendingEmail}</strong>
+          </p>
+          <p className="text-xs leading-6 text-slate-500">
+            The link expires in 15 minutes. Check your spam folder if it doesn't arrive.
+          </p>
+          <Message success>{resendMessage}</Message>
+          <button
+            type="button"
+            disabled={resending}
+            onClick={handleResend}
+            className="auth-submit w-full disabled:opacity-60"
+          >
+            {resending ? "Sending..." : "Resend verification email"}
+          </button>
+          <Link
+            to="/login"
+            className="block text-sm font-bold text-[#249dcc] no-underline"
+          >
+            Back to login
+          </Link>
+        </div>
+      </AuthLayout>
     );
   }
 
@@ -367,10 +503,8 @@ export function RegisterPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="auth-label">Full name</label>
-
           <div className="auth-input-wrap">
             <UserRound size={17} className="auth-input-icon" />
-
             <input
               className="auth-input"
               type="text"
@@ -379,17 +513,16 @@ export function RegisterPage() {
               placeholder="Your name"
               autoComplete="name"
               required
-              maxLength={80}
+              minLength={2}
+              maxLength={50}
             />
           </div>
         </div>
 
         <div>
           <label className="auth-label">Email address</label>
-
           <div className="auth-input-wrap">
             <Mail size={17} className="auth-input-icon" />
-
             <input
               className="auth-input"
               type="email"
@@ -398,6 +531,7 @@ export function RegisterPage() {
               placeholder="you@example.com"
               autoComplete="email"
               required
+              maxLength={254}
             />
           </div>
         </div>
@@ -429,7 +563,7 @@ export function RegisterPage() {
         <Message>{error}</Message>
 
         <AuthButton>
-          Create account <ArrowRight size={17} />
+          {loading ? "Creating account..." : "Create account"} <ArrowRight size={17} />
         </AuthButton>
       </form>
 
@@ -449,18 +583,30 @@ export function RegisterPage() {
     </AuthLayout>
   );
 }
-
 // FORGOT PASSWORD PAGE
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    setError("");
 
-    setMessage(
-      "Password recovery will be available once email services are connected."
-    );
+    if (!email.trim() || !password) {
+      setError("Please enter your email and password.");
+      return;
+    }
+
+    const result = await login({
+      email: email.trim().toLowerCase(),
+      password
+    });
+
+    if (result.success) {
+      navigate("/dashboard", { replace: true });
+    } else {
+      setError(result.message);
+    }
   }
 
   return (
@@ -513,24 +659,25 @@ export function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    setError("");
 
-    if (password.length < 8) {
-      setMessage("Password must contain at least 8 characters.");
+    if (!email.trim() || !password) {
+      setError("Please enter your email and password.");
       return;
     }
 
-    if (password !== confirmPassword) {
-      setMessage("Your passwords do not match.");
-      return;
-    }
+    const result = await login({
+      email: email.trim().toLowerCase(),
+      password
+    });
 
-    setMessage(
-      token
-        ? "Password reset will be enabled after backend integration."
-        : "This reset link is incomplete."
-    );
+    if (result.success) {
+      navigate("/dashboard", { replace: true });
+    } else {
+      setError(result.message);
+    }
   }
 
   return (
@@ -568,3 +715,90 @@ export function ResetPasswordPage() {
     </AuthLayout>
   );
 }
+
+
+
+
+
+
+// EMAIL VERIFICATION RESULT PAGE
+export function EmailVerificationPage() {
+  const navigate = useNavigate();
+  const { completeEmailVerification } = useAuth();
+  const [status, setStatus] = useState("checking");
+  const verificationStartedRef = useRef(false);
+
+  useEffect(() => {
+    if (verificationStartedRef.current) return;
+    verificationStartedRef.current = true;
+    let active = true;
+
+    async function verify() {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+
+      if (!token) {
+        if (active) setStatus("This verification link is missing or invalid.");
+        return;
+      }
+
+      try {
+        const response = await api.get("/auth/verify-email", {
+          params: { token }
+        });
+
+        if (!response.data?.accessToken || !response.data?.user) {
+          throw new Error("The server returned an incomplete login response.");
+        }
+
+        completeEmailVerification(response.data);
+
+        if (active) {
+          navigate("/?verified=1", { replace: true });
+        }
+      } catch (error) {
+        if (active) {
+          setStatus(
+            typeof error.response?.data === "string"
+              ? error.response.data
+              : error.response?.data?.message ||
+                error.message ||
+                "This verification link is invalid or expired."
+          );
+        }
+      }
+    }
+
+    verify();
+
+
+  }, [navigate, completeEmailVerification]);
+
+  return (
+    <AuthLayout
+      heading={status === "checking" ? "Verifying your email..." : "Verification unsuccessful"}
+      description={
+        status === "checking"
+          ? "Please wait while we activate your account and sign you in."
+          : status
+      }
+    >
+      <div className="text-center">
+        {status === "checking" ? (
+          <p className="text-sm text-slate-500">
+            Your account is being activated securely.
+          </p>
+        ) : (
+          <Link
+            to="/register"
+            className="block text-sm font-bold text-[#249dcc] no-underline"
+          >
+            Back to registration
+          </Link>
+        )}
+      </div>
+    </AuthLayout>
+  );
+}
+
+
